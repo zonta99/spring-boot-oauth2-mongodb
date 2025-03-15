@@ -1,4 +1,4 @@
-// src/main/java/com/example/userauthservice/security/OAuth2AuthenticationSuccessHandler.java
+// src/main/java/com/example/userauthservice/security/oauth2/handler/OAuth2AuthenticationSuccessHandler.java
 package com.example.userauthservice.security.oauth2.handler;
 
 import com.example.userauthservice.config.AppProperties;

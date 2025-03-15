@@ -1,4 +1,4 @@
-// src/main/java/com/example/userauthservice/security/OAuth2AuthenticationFailureHandler.java
+// src/main/java/com/example/userauthservice/security/oauth2/handler/OAuth2AuthenticationFailureHandler.java
 package com.example.userauthservice.security.oauth2.handler;
 
 import com.example.userauthservice.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;

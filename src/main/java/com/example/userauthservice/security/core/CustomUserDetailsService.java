@@ -1,10 +1,9 @@
-// src/main/java/com/example/userauthservice/security/CustomUserDetailsService.java
-package com.example.userauthservice.security.oauth2.user;
+// src/main/java/com/example/userauthservice/security/oauth2/user/CustomUserDetailsService.java
+package com.example.userauthservice.security.core;
 
 import com.example.userauthservice.exception.ResourceNotFoundException;
 import com.example.userauthservice.model.User;
 import com.example.userauthservice.repository.UserRepository;
-import com.example.userauthservice.security.core.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
