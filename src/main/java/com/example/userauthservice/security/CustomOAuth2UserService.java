@@ -3,7 +3,6 @@ package com.example.userauthservice.security;
 import com.example.userauthservice.exception.OAuth2AuthenticationProcessingException;
 import com.example.userauthservice.model.User;
 import com.example.userauthservice.repository.UserRepository;
-import com.example.userauthservice.security.user.OAuth2UserInfo;
 import com.example.userauthservice.security.user.OAuth2UserInfoFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;

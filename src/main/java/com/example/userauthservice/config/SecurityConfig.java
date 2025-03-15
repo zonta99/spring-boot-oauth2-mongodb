@@ -2,8 +2,6 @@
 package com.example.userauthservice.config;
 
 import com.example.userauthservice.security.CustomOAuth2UserService;
-import com.example.userauthservice.security.HttpCookieOAuth2AuthorizationRequestRepository;
-import com.example.userauthservice.security.OAuth2AuthenticationFailureHandler;
 import com.example.userauthservice.security.OAuth2AuthenticationSuccessHandler;
 import com.example.userauthservice.security.RestAuthenticationEntryPoint;
 import com.example.userauthservice.security.TokenAuthenticationFilter;
