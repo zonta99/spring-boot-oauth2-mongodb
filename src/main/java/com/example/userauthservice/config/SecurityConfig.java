@@ -3,6 +3,8 @@ package com.example.userauthservice.config;
 
 import com.example.userauthservice.security.oauth2.service.CustomOAuth2UserService;
 import com.example.userauthservice.security.oauth2.handler.OAuth2AuthenticationSuccessHandler;
+import com.example.userauthservice.security.oauth2.handler.OAuth2AuthenticationFailureHandler;
+import com.example.userauthservice.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.example.userauthservice.security.core.RestAuthenticationEntryPoint;
 import com.example.userauthservice.security.jwt.TokenAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,8 @@ public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
@@ -49,12 +53,14 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(endpoint -> endpoint
-                                .baseUri("/oauth2/authorize"))
+                                .baseUri("/oauth2/authorize")
+                                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
                         .redirectionEndpoint(endpoint -> endpoint
                                 .baseUri("/oauth2/callback/*"))
                         .userInfoEndpoint(endpoint -> endpoint
                                 .userService(customOAuth2UserService))
-                        .successHandler(oAuth2AuthenticationSuccessHandler));
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler));
 
         // Add our custom token authentication filter
         http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -1,4 +1,4 @@
-// src/main/java/com/example/userauthservice/security/TokenProvider.java
+// src/main/java/com/example/userauthservice/security/jwt/TokenProvider.java
 package com.example.userauthservice.security.jwt;
 
 import com.example.userauthservice.security.core.UserPrincipal;
@@ -46,7 +46,12 @@ public class TokenProvider {
                 .signWith(key)
                 .compact();
     }
-
+    
+    /**
+     * Creates a JWT token from just a user ID.
+     * Preserved for future use in token refresh functionality.
+     */
+    @SuppressWarnings("unused")
     public String createToken(String userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + tokenExpirationMsec);
