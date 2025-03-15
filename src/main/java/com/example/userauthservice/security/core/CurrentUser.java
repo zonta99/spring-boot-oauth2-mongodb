@@ -1,5 +1,5 @@
 // src/main/java/com/example/userauthservice/security/CurrentUser.java
-package com.example.userauthservice.security;
+package com.example.userauthservice.security.core;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 

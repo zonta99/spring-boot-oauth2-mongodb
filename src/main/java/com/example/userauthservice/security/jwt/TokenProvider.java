@@ -1,6 +1,7 @@
 // src/main/java/com/example/userauthservice/security/TokenProvider.java
-package com.example.userauthservice.security;
+package com.example.userauthservice.security.jwt;
 
+import com.example.userauthservice.security.core.UserPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

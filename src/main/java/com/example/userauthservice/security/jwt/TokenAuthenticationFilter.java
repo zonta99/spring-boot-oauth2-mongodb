@@ -1,5 +1,5 @@
 // src/main/java/com/example/userauthservice/security/TokenAuthenticationFilter.java
-package com.example.userauthservice.security;
+package com.example.userauthservice.security.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

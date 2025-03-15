@@ -8,7 +8,7 @@ import com.example.userauthservice.dto.SignupRequest;
 import com.example.userauthservice.exception.BadRequestException;
 import com.example.userauthservice.model.User;
 import com.example.userauthservice.repository.UserRepository;
-import com.example.userauthservice.security.TokenProvider;
+import com.example.userauthservice.security.jwt.TokenProvider;
 import com.example.userauthservice.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

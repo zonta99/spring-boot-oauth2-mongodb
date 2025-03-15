@@ -1,8 +1,10 @@
 // src/main/java/com/example/userauthservice/security/OAuth2AuthenticationSuccessHandler.java
-package com.example.userauthservice.security;
+package com.example.userauthservice.security.oauth2.handler;
 
 import com.example.userauthservice.config.AppProperties;
 import com.example.userauthservice.exception.BadRequestException;
+import com.example.userauthservice.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.example.userauthservice.security.jwt.TokenProvider;
 import com.example.userauthservice.util.CookieUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +19,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 
-import static com.example.userauthservice.security.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static com.example.userauthservice.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
 @RequiredArgsConstructor

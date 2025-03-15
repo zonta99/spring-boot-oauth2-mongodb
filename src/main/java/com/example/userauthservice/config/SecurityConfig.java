@@ -1,10 +1,10 @@
 // src/main/java/com/example/userauthservice/config/SecurityConfig.java
 package com.example.userauthservice.config;
 
-import com.example.userauthservice.security.CustomOAuth2UserService;
-import com.example.userauthservice.security.OAuth2AuthenticationSuccessHandler;
-import com.example.userauthservice.security.RestAuthenticationEntryPoint;
-import com.example.userauthservice.security.TokenAuthenticationFilter;
+import com.example.userauthservice.security.oauth2.service.CustomOAuth2UserService;
+import com.example.userauthservice.security.oauth2.handler.OAuth2AuthenticationSuccessHandler;
+import com.example.userauthservice.security.core.RestAuthenticationEntryPoint;
+import com.example.userauthservice.security.jwt.TokenAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

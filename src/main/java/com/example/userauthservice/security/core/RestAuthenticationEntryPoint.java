@@ -1,5 +1,5 @@
 // src/main/java/com/example/userauthservice/security/RestAuthenticationEntryPoint.java
-package com.example.userauthservice.security;
+package com.example.userauthservice.security.core;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,5 +1,5 @@
 // src/main/java/com/example/userauthservice/security/UserPrincipal.java
-package com.example.userauthservice.security;
+package com.example.userauthservice.security.core;
 
 import com.example.userauthservice.model.User;
 import lombok.AllArgsConstructor;

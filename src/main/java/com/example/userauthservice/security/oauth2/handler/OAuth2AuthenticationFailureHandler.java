@@ -1,6 +1,7 @@
 // src/main/java/com/example/userauthservice/security/OAuth2AuthenticationFailureHandler.java
-package com.example.userauthservice.security;
+package com.example.userauthservice.security.oauth2.handler;
 
+import com.example.userauthservice.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.example.userauthservice.util.CookieUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -14,7 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
-import static com.example.userauthservice.security.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static com.example.userauthservice.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
 @RequiredArgsConstructor

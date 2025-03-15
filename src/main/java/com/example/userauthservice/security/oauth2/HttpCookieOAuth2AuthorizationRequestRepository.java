@@ -1,5 +1,5 @@
 // src/main/java/com/example/userauthservice/security/HttpCookieOAuth2AuthorizationRequestRepository.java
-package com.example.userauthservice.security;
+package com.example.userauthservice.security.oauth2;
 
 import com.example.userauthservice.util.CookieUtils;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
