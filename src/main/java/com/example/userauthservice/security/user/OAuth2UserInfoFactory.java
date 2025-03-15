@@ -1,8 +1,10 @@
-// src/main/java/com/example/userauthservice/security/oauth2/OAuth2UserInfoFactory.java
-package com.example.userauthservice.security.oauth2;
+// src/main/java/com/example/userauthservice/security/user/OAuth2UserInfoFactory.java
+package com.example.userauthservice.security.user;
 
 import com.example.userauthservice.exception.OAuth2AuthenticationProcessingException;
 import com.example.userauthservice.model.User.AuthProvider;
+import com.example.userauthservice.security.oauth2.GithubOAuth2UserInfo;
+import com.example.userauthservice.security.oauth2.GoogleOAuth2UserInfo;
 
 import java.util.Map;
 

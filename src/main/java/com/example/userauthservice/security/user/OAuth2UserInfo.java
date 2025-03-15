@@ -1,5 +1,5 @@
 // src/main/java/com/example/userauthservice/security/oauth2/OAuth2UserInfo.java
-package com.example.userauthservice.security.oauth2;
+package com.example.userauthservice.security.user;
 
 import java.util.Map;
 
