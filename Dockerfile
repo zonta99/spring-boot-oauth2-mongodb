@@ -1,54 +1,38 @@
-FROM eclipse-temurin:17-jdk-alpine AS build
-WORKDIR /workspace/app
+FROM eclipse-temurin:17-jdk
 
-# Copy maven wrapper and pom.xml
+WORKDIR /app
+
+# Install wait-for-it script for service health checking
+RUN apt-get update && apt-get install -y wget && \
+    wget -q -O /usr/local/bin/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
+    chmod +x /usr/local/bin/wait-for-it.sh
+
+# Copy the Maven wrapper files
 COPY mvnw .
+COPY mvnw.cmd .
 COPY .mvn .mvn
+
+# Copy pom.xml and source code
 COPY pom.xml .
-COPY .gitattributes .
-# Make the mvnw file executable
-RUN chmod +x mvnw
+COPY src ./src
 
-# Download dependencies
-RUN ./mvnw dependency:go-offline -B
-
-# Copy source code
-COPY src src
-
-# Create application.yml with MongoDB configuration directly in the container
-RUN mkdir -p src/main/resources
-RUN echo "spring:" > src/main/resources/application.yml
-RUN echo "  data:" >> src/main/resources/application.yml
-RUN echo "    mongodb:" >> src/main/resources/application.yml
-RUN echo "      uri: \${SPRING_DATA_MONGODB_URI:mongodb://mongoadmin:secret@mongodb:27017/userdb?authSource=admin}" >> src/main/resources/application.yml
-# FIXED: Removed self-references by using direct values instead of referencing the same properties
-RUN echo "      host: mongodb" >> src/main/resources/application.yml
-RUN echo "      port: 27017" >> src/main/resources/application.yml
-RUN echo "      database: userdb" >> src/main/resources/application.yml
-RUN echo "      username: mongoadmin" >> src/main/resources/application.yml
-RUN echo "      password: secret" >> src/main/resources/application.yml
-RUN echo "      authentication-database: admin" >> src/main/resources/application.yml
-RUN echo "      auto-index-creation: true" >> src/main/resources/application.yml
-
-# Add app auth properties for JWT 
-RUN echo "app:" >> src/main/resources/application.yml
-RUN echo "  auth:" >> src/main/resources/application.yml
-RUN echo "    tokenSecret: \${TOKEN_SECRET:cff8c43509cf688e99090dbebd3aae0ed06a6baf65fa1438e3fbb3326dc59e9d}" >> src/main/resources/application.yml
-RUN echo "    tokenExpirationMsec: 864000000" >> src/main/resources/application.yml
+# Fix file permissions for mvnw (common issue on Windows)
+RUN chmod +x ./mvnw
 
 # Build the application
 RUN ./mvnw package -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
-# Runtime stage
-FROM eclipse-temurin:17-jre-alpine
-VOLUME /tmp
-ARG DEPENDENCY=/workspace/app/target/dependency
+# Create a startup script
+RUN echo '#!/bin/bash\n\
+echo "Waiting for MongoDB to be ready..."\n\
+wait-for-it.sh mongodb:27017 -t 60\n\
+if [ $? -ne 0 ]; then\n\
+  echo "MongoDB connection failed!"\n\
+  exit 1\n\
+fi\n\
+echo "MongoDB is up - starting application"\n\
+java -jar target/user-auth-service-0.0.1-SNAPSHOT.jar\n\
+' > /app/start.sh && chmod +x /app/start.sh
 
-# Copy the dependency application layer
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-
-# Set the entry point
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.example.userauthservice.UserAuthServiceApplication"]
+# Run the application with the startup script
+CMD ["/app/start.sh"]

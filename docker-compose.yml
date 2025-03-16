@@ -1,35 +1,46 @@
-version: '3'
+version: '3.8'
+
 services:
   app:
-    build: .  # This builds using your Dockerfile
-    depends_on:
-      - mongodb
-    environment:
-      - TOKEN_SECRET=cff8c43509cf688e99090dbebd3aae0ed06a6baf65fa1438e3fbb3326dc59e9d
-      - GOOGLE_CLIENT_ID=your_google_id
-      - GOOGLE_CLIENT_SECRET=your_google_secret
-      - GITHUB_CLIENT_ID=your_github_id
-      - GITHUB_CLIENT_SECRET=your_github_secret
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user-auth-service
     ports:
       - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/userdb
+      - GOOGLE_CLIENT_ID=your-google-client-id
+      - GOOGLE_CLIENT_SECRET=your-google-client-secret
+      - GITHUB_CLIENT_ID=your-github-client-id
+      - GITHUB_CLIENT_SECRET=your-github-client-secret
+      - TOKEN_SECRET=cff8c43509cf688e99090dbebd3aae0ed06a6baf65fa1438e3fbb3326dc59e9d
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: on-failure
     networks:
-      - app-network
+      - auth-network
 
   mongodb:
     image: mongo:latest
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
-      - MONGO_INITDB_ROOT_PASSWORD=secret
+    container_name: mongodb
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data:/data/db
+      - mongo-data:/data/db
     networks:
-      - app-network
+      - auth-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 networks:
-  app-network:
+  auth-network:
     driver: bridge
 
 volumes:
-  mongodb_data:
+  mongo-data:
