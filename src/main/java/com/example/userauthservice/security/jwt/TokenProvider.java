@@ -1,6 +1,7 @@
 // src/main/java/com/example/userauthservice/security/jwt/TokenProvider.java
 package com.example.userauthservice.security.jwt;
 
+import com.example.userauthservice.security.core.CustomUserDetailsService;
 import com.example.userauthservice.security.core.UserPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -83,7 +84,13 @@ public class TokenProvider {
 
     public Authentication getAuthentication(String token) {
         String userId = getUserIdFromToken(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+
+        // Cast to CustomUserDetailsService to access the loadUserById method
+        CustomUserDetailsService customUserDetailsService = (CustomUserDetailsService) userDetailsService;
+
+        // Use loadUserById instead of loadUserByUsername
+        UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 

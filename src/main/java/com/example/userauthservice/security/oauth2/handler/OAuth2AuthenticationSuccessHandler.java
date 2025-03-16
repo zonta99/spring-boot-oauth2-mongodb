@@ -10,6 +10,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final TokenProvider tokenProvider;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final AppProperties appProperties;
+
+    @Value("${app.oauth2.defaultRedirectUri:http://localhost:3000/oauth-callback}")
+    private String defaultRedirectUri;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -52,7 +56,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             throw new BadRequestException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
         }
 
-        String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
+        // Use the redirect URI from cookie or fall back to the default frontend URL
+        String targetUrl = redirectUri.orElse(defaultRedirectUri);
         String token = tokenProvider.createToken(authentication);
 
         return UriComponentsBuilder.fromUriString(targetUrl)
@@ -67,6 +72,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private boolean isAuthorizedRedirectUri(String uri) {
         URI clientRedirectUri = URI.create(uri);
+
+        // If no authorized redirect URIs are configured, only allow the default redirect URI
+        if (appProperties.getOauth2().getAuthorizedRedirectUris().isEmpty()) {
+            URI defaultUri = URI.create(defaultRedirectUri);
+            return defaultUri.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
+                    && defaultUri.getPort() == clientRedirectUri.getPort();
+        }
 
         return appProperties.getOauth2().getAuthorizedRedirectUris()
                 .stream()
