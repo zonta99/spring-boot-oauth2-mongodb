@@ -1,73 +1,35 @@
-version: '3.8'
-
+version: '3'
 services:
-  # MongoDB Service
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    restart: always
-    ports:
-      - "27017:27017"
+  app:
+    build: .  # This builds using your Dockerfile
+    depends_on:
+      - mongodb
     environment:
-      - MONGO_INITDB_DATABASE=userdb
-      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
-      - MONGO_INITDB_ROOT_PASSWORD=secret
-    volumes:
-      - mongodb-data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    networks:
-      - auth-network
-
-  # User Auth Service
-  user-auth-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: user-auth-service
-    restart: always
+      - TOKEN_SECRET=cff8c43509cf688e99090dbebd3aae0ed06a6baf65fa1438e3fbb3326dc59e9d
+      - GOOGLE_CLIENT_ID=your_google_id
+      - GOOGLE_CLIENT_SECRET=your_google_secret
+      - GITHUB_CLIENT_ID=your_github_id
+      - GITHUB_CLIENT_SECRET=your_github_secret
     ports:
       - "8080:8080"
-    environment:
-      # MongoDB connection settings
-      - SPRING_DATA_MONGODB_URI=mongodb://mongoadmin:secret@mongodb:27017/userdb?authSource=admin
-      # Alternative property format (providing multiple ways to configure)
-      - spring.data.mongodb.host=mongodb
-      - spring.data.mongodb.port=27017
-      - spring.data.mongodb.database=userdb
-      - spring.data.mongodb.username=mongoadmin
-      - spring.data.mongodb.password=secret
-      - spring.data.mongodb.authentication-database=admin
-      # Debug logging
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_DATA_MONGODB=DEBUG
-      - LOGGING_LEVEL_COM_MONGODB=DEBUG
-      - LOGGING_LEVEL_COM_EXAMPLE=DEBUG
-      # Authentication settings
-      - TOKEN_SECRET=cff8c43509cf688e99090dbebd3aae0ed06a6baf65fa1438e3fbb3326dc59e9d
-      - GOOGLE_CLIENT_ID=your-google-client-id
-      - GOOGLE_CLIENT_SECRET=your-google-client-secret
-      - GITHUB_CLIENT_ID=your-github-client-id
-      - GITHUB_CLIENT_SECRET=your-github-client-secret
-    depends_on:
-      mongodb:
-        condition: service_healthy
     networks:
-      - auth-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+      - app-network
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
 
 networks:
-  auth-network:
+  app-network:
     driver: bridge
 
 volumes:
-  mongodb-data:
+  mongodb_data:

@@ -2,12 +2,11 @@ spring:
   data:
     mongodb:
       uri: mongodb://mongodb:27017/userdb
-      # Additional configuration (redundant with URI but sometimes helps)
       host: mongodb
       port: 27017
-      database: userdb
+      database: userdb  # Fixed - no circular reference
       auto-index-creation: true
-
+      
   # OAuth2 configuration
   security:
     oauth2:
@@ -31,6 +30,7 @@ spring:
 # JWT configuration
 app:
   auth:
+    # Remove space after colon and ensure no special chars in the default value
     tokenSecret: ${TOKEN_SECRET:cff8c43509cf688e99090dbebd3aae0ed06a6baf65fa1438e3fbb3326dc59e9d}
     tokenExpirationMsec: 864000000 # 10 days
 

@@ -21,13 +21,20 @@ RUN echo "spring:" > src/main/resources/application.yml
 RUN echo "  data:" >> src/main/resources/application.yml
 RUN echo "    mongodb:" >> src/main/resources/application.yml
 RUN echo "      uri: \${SPRING_DATA_MONGODB_URI:mongodb://mongoadmin:secret@mongodb:27017/userdb?authSource=admin}" >> src/main/resources/application.yml
-RUN echo "      host: \${spring.data.mongodb.host:mongodb}" >> src/main/resources/application.yml
-RUN echo "      port: \${spring.data.mongodb.port:27017}" >> src/main/resources/application.yml
-RUN echo "      database: \${spring.data.mongodb.database:userdb}" >> src/main/resources/application.yml
-RUN echo "      username: \${spring.data.mongodb.username:mongoadmin}" >> src/main/resources/application.yml
-RUN echo "      password: \${spring.data.mongodb.password:secret}" >> src/main/resources/application.yml
+# FIXED: Removed self-references by using direct values instead of referencing the same properties
+RUN echo "      host: mongodb" >> src/main/resources/application.yml
+RUN echo "      port: 27017" >> src/main/resources/application.yml
+RUN echo "      database: userdb" >> src/main/resources/application.yml
+RUN echo "      username: mongoadmin" >> src/main/resources/application.yml
+RUN echo "      password: secret" >> src/main/resources/application.yml
 RUN echo "      authentication-database: admin" >> src/main/resources/application.yml
 RUN echo "      auto-index-creation: true" >> src/main/resources/application.yml
+
+# Add app auth properties for JWT 
+RUN echo "app:" >> src/main/resources/application.yml
+RUN echo "  auth:" >> src/main/resources/application.yml
+RUN echo "    tokenSecret: \${TOKEN_SECRET:cff8c43509cf688e99090dbebd3aae0ed06a6baf65fa1438e3fbb3326dc59e9d}" >> src/main/resources/application.yml
+RUN echo "    tokenExpirationMsec: 864000000" >> src/main/resources/application.yml
 
 # Build the application
 RUN ./mvnw package -DskipTests
