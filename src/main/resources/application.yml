@@ -1,16 +1,14 @@
-# src/main/resources/application.yml
 spring:
-  # Using Spring Boot 3.4.3
-  application:
-    name: user-auth-service
-  
   data:
     mongodb:
-      host: localhost
+      uri: mongodb://mongodb:27017/userdb
+      # Additional configuration (redundant with URI but sometimes helps)
+      host: mongodb
       port: 27017
       database: userdb
       auto-index-creation: true
-  
+
+  # OAuth2 configuration
   security:
     oauth2:
       client:
@@ -18,34 +16,27 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
               - profile
           github:
             client-id: ${GITHUB_CLIENT_ID}
             client-secret: ${GITHUB_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - user:email
               - read:user
 
-# Server configuration              
-server:
-  port: 8080
-  servlet:
-    context-path: /api
-
-# Logging configuration
-logging:
-  level:
-    org.springframework.security: DEBUG
-    org.springframework.data.mongodb: DEBUG
-    com.example: DEBUG
-
-# App custom properties
+# JWT configuration
 app:
   auth:
     tokenSecret: ${TOKEN_SECRET:cff8c43509cf688e99090dbebd3aae0ed06a6baf65fa1438e3fbb3326dc59e9d}
     tokenExpirationMsec: 864000000 # 10 days
-  oauth2:
-    authorizedRedirectUris:
-      - http://localhost:3000/oauth2/redirect
+
+# Logging configuration
+logging:
+  level:
+    org.springframework.data.mongodb: DEBUG
+    com.mongodb: DEBUG
+    com.example.userauthservice: DEBUG
