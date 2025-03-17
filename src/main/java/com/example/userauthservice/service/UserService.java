@@ -2,14 +2,18 @@
 package com.example.userauthservice.service;
 
 import com.example.userauthservice.dto.UserProfileResponse;
+import com.example.userauthservice.exception.BadRequestException;
 import com.example.userauthservice.exception.ResourceNotFoundException;
 import com.example.userauthservice.model.User;
 import com.example.userauthservice.repository.UserRepository;
+import com.example.userauthservice.security.oauth2.user.OAuth2UserInfo;
+import com.example.userauthservice.security.oauth2.user.OAuth2UserInfoFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -84,5 +88,32 @@ public class UserService {
     public void deleteUser(String userId) {
         User user = getUserById(userId);
         userRepository.delete(user);
+    }
+
+    public boolean linkUserAccount(String userId, User.AuthProvider provider, Map<String, Object> attributes) {
+        User user = getUserById(userId);
+
+        // Create OAuth2UserInfo to extract data
+        OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(
+                provider.toString().toLowerCase(), attributes);
+
+        // Check if another account already uses this provider identity
+        if (userRepository.findByProviderAndProviderId(provider, userInfo.getId()).isPresent()) {
+            throw new BadRequestException("This " + provider + " account is already linked with another user");
+        }
+
+        // Link the provider
+        user.linkProvider(provider, userInfo.getId());
+
+        // Update user's profile info if needed
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(userInfo.getName());
+        }
+        if (user.getImageUrl() == null || user.getImageUrl().isEmpty()) {
+            user.setImageUrl(userInfo.getImageUrl());
+        }
+
+        userRepository.save(user);
+        return true;
     }
 }

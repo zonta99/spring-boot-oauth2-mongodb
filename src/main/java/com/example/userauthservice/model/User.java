@@ -12,7 +12,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -48,6 +50,29 @@ public class User {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @Builder.Default
+    private Map<AuthProvider, String> linkedProviders = new HashMap<>();
+
+    // For backward compatibility
+    public AuthProvider getProvider() {
+        // Return the primary provider (first one or LOCAL)
+        return linkedProviders.isEmpty() ? AuthProvider.LOCAL :
+                linkedProviders.keySet().iterator().next();
+    }
+
+    public String getProviderId() {
+        return linkedProviders.get(getProvider());
+    }
+
+    // Helper methods
+    public void linkProvider(AuthProvider provider, String providerId) {
+        this.linkedProviders.put(provider, providerId);
+    }
+
+    public boolean hasProvider(AuthProvider provider) {
+        return this.linkedProviders.containsKey(provider);
+    }
 
     public enum AuthProvider {
         LOCAL, GOOGLE, GITHUB

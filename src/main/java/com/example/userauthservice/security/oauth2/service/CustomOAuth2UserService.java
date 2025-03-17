@@ -40,25 +40,31 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
         String registrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId();
-        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(registrationId, oAuth2User.getAttributes());
+        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(
+                registrationId, oAuth2User.getAttributes());
 
         if (!StringUtils.hasText(oAuth2UserInfo.getEmail())) {
-            throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
+            throw new OAuth2AuthenticationProcessingException(
+                    "Email not found from OAuth2 provider");
         }
 
         Optional<User> userOptional = userRepository.findByEmail(oAuth2UserInfo.getEmail());
         User user;
 
+        User.AuthProvider provider = User.AuthProvider.valueOf(registrationId.toUpperCase());
+
         if (userOptional.isPresent()) {
             user = userOptional.get();
 
-            if (!user.getProvider().equals(User.AuthProvider.valueOf(registrationId.toUpperCase()))) {
-                throw new OAuth2AuthenticationProcessingException("You're signed up with " +
-                        user.getProvider() + " account. Please use your " + user.getProvider() +
-                        " account to login.");
+            // If the user doesn't have this provider linked yet, link it
+            if (!user.hasProvider(provider)) {
+                user.linkProvider(provider, oAuth2UserInfo.getId());
+                // Update user info
+                user = updateExistingUser(user, oAuth2UserInfo);
+            } else if (!user.getLinkedProviders().get(provider).equals(oAuth2UserInfo.getId())) {
+                throw new OAuth2AuthenticationProcessingException(
+                        "You're already linked to a different " + provider + " account");
             }
-
-            user = updateExistingUser(user, oAuth2UserInfo);
         } else {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
         }
